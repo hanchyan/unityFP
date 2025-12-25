@@ -5,6 +5,8 @@ public class BodyMovement : MonoBehaviour
     public float speed = 6f;
     Rigidbody rb;
 
+    public Transform head; // assign the Head transform in Inspector
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -20,9 +22,17 @@ public class BodyMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.W)) v = 1f;
         if (Input.GetKey(KeyCode.S)) v = -1f;
 
-        Vector3 move = transform.forward * v + transform.right * h;
-        Vector3 targetPos = rb.position + move * speed * Time.fixedDeltaTime;
+        // Build movement relative to head orientation
+        Vector3 forward = head.forward;
+        forward.y = 0; // flatten so we don’t move up/down
+        forward.Normalize();
 
-        rb.MovePosition(targetPos);
+        Vector3 right = head.right;
+        right.y = 0;
+        right.Normalize();
+
+        Vector3 move = forward * v + right * h;
+
+        rb.MovePosition(rb.position + move * speed * Time.fixedDeltaTime);
     }
 }
